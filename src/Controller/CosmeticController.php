@@ -44,6 +44,27 @@ class CosmeticController extends AbstractController
         }
     }
     /**
+     * @Route("/cosmetic/{id}/update", name="update")
+     */
+    public function update($id, CosmeticRepository $repo, Request $request)
+    {
+
+        $produit = $repo->find($id);
+
+        $formulaire = $this->createForm(CosmeticType::class, $produit);
+
+        $formulaire->handleRequest($request);
+
+        if ($formulaire->isSubmitted() && $formulaire->isValid()) {
+            $repo->add($produit);
+            return $this->redirectToRoute('app_cosmetic');
+        } else {
+            return $this->render('cosmetic/formulaire.html.twig', [
+                'formView' => $formulaire->createView(),
+            ]);
+        }
+    }
+    /**
      * @Route("/cosmetic/{id}/delete", name="delete")
      */
     public function supprimer($id, CosmeticRepository $repo): Response
@@ -65,10 +86,10 @@ class CosmeticController extends AbstractController
         ]);
     }
 
-    // public function modifier(): Response
-    // {
-    //     return $this->render('cosmetic/index.html.twig', [
-    //         'controller_name' => 'CosmeticController',
-    //     ]);
-    // }
+    public function modifier(): Response
+    {
+        return $this->render('cosmetic/index.html.twig', [
+            'controller_name' => 'CosmeticController',
+        ]);
+    }
 }
