@@ -2,10 +2,13 @@
 
 namespace App\Controller;
 
+use App\Entity\Cosmetic;
+use App\Form\CosmeticType;
 use App\Repository\CosmeticRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class CosmeticController extends AbstractController
 {
@@ -19,6 +22,26 @@ class CosmeticController extends AbstractController
             'controller_name' => 'CosmeticController',
             'produits' => $produits
         ]);
+    }
+    /**
+     * @Route("/cosmetic/create", name="create")
+     */
+    public function ajouter(CosmeticRepository $repo, Request $request): Response
+    {
+        $produit = new Cosmetic;
+
+        $formulaire = $this->createForm(CosmeticType::class, $produit);
+
+        $formulaire->handleRequest($request);
+
+        if ($formulaire->isSubmitted() && $formulaire->isValid()) {
+            $repo->add($produit);
+            return $this->redirectToRoute('app_cosmetic');
+        } else {
+            return $this->render('cosmetic/formulaire.html.twig', [
+                'formView' => $formulaire->createView(),
+            ]);
+        }
     }
     /**
      * @Route("/cosmetic/{id}/delete", name="delete")
@@ -41,12 +64,7 @@ class CosmeticController extends AbstractController
             'produit' => $produit,
         ]);
     }
-    // public function ajouter(): Response
-    // {
-    //     return $this->render('cosmetic/index.html.twig', [
-    //         'controller_name' => 'CosmeticController',
-    //     ]);
-    // }
+
     // public function modifier(): Response
     // {
     //     return $this->render('cosmetic/index.html.twig', [
